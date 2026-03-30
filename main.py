@@ -2,6 +2,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 import logging
+import uvicorn
 
 # ------------------------
 # Configurar logging
@@ -26,9 +27,6 @@ app = FastAPI(
 # ------------------------
 @app.get("/ping", tags=["health"])
 async def ping():
-    """
-    Ruta para verificar que la API está viva
-    """
     logger.info("Ping recibido")
     return {"message": "pong"}
 
@@ -37,9 +35,6 @@ async def ping():
 # ------------------------
 @app.get("/items/{item_id}", tags=["items"])
 async def read_item(item_id: int):
-    """
-    Retorna un ítem por ID, con manejo de error
-    """
     if item_id < 0:
         logger.warning(f"ID inválido recibido: {item_id}")
         raise HTTPException(status_code=400, detail="ID debe ser positivo")
@@ -57,12 +52,11 @@ async def global_exception_handler(request, exc):
     )
 
 # ------------------------
-# Entrypoint para producción
+# Ejecutar FastAPI
 # ------------------------
-# NOTA: En producción se recomienda ejecutar:
-# uvicorn main:app --host 0.0.0.0 --port 8000
-# O con gunicorn: gunicorn -k uvicorn.workers.UvicornWorker main:app
-# ------------------------
+def start():
+    # uvicorn.run se queda corriendo mientras el script esté activo
+    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, log_level="info")
+    start()
