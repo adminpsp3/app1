@@ -23,6 +23,13 @@ app = FastAPI(
 )
 
 # ------------------------
+# Ruta raiz
+# ------------------------
+@app.get("/")
+def read_root():
+    return {"message": "API funcionando"}
+    
+# ------------------------
 # Ruta de prueba
 # ------------------------
 @app.get("/ping", tags=["health"])
